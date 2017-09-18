@@ -1,0 +1,29 @@
+env:
+  - VERSION=1.1.54276
+
+language: python
+python:
+  - "3.5"
+  - "3.6"
+cache: pip
+services:
+  - docker
+before_install:
+  - docker run -d -p 127.0.0.1:9000:9000 --name test-clickhouse-server --ulimit nofile=262144:262144 yandex/clickhouse-server:$VERSION
+  - docker run -d --entrypoint "/bin/sh" --name test-clickhouse-client --link test-clickhouse-server:clickhouse-server yandex/clickhouse-client:$VERSION -c 'while :; do sleep 1; done'
+  - docker ps -a
+  # Faking clickhouse-client real comminitation with container via docker exec.
+  - echo -e '#!/bin/bash\n\ndocker exec test-clickhouse-client clickhouse-client "$@"' | sudo tee /usr/local/bin/clickhouse-client > /dev/null
+  - sudo chmod +x /usr/local/bin/clickhouse-client
+  # Overriding setup.cfg. Set host=clickhouse-server
+  - echo -e '[db]\nhost=clickhouse-server\nport=9000\ndatabase=test\nuser=default\npassword=\ncompression=lz4,lz4hc,zstd' > setup.cfg
+  # Make host think that clickhouse-server is localhost
+  - echo '127.0.0.1 clickhouse-server' | sudo tee /etc/hosts > /dev/null
+install:
+  pip install flake8 flake8-print coveralls
+before_script:
+  flake8 .
+script:
+  - coverage run --source=aioch setup.py test
+after_success:
+  - coveralls
