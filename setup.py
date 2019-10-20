@@ -16,7 +16,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 
 def read_version():
-    regexp = re.compile('^VERSION\W*=\W*\(([^\(\)]*)\)')
+    regexp = re.compile(r'^VERSION\W*=\W*\(([^\(\)]*)\)')
     init_py = os.path.join(here, 'aioch', '__init__.py')
     with open(init_py) as f:
         for line in f:
@@ -68,6 +68,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
 
         'Topic :: Database',
         'Topic :: Software Development',
