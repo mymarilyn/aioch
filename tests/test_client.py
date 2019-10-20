@@ -1,3 +1,5 @@
+import types
+
 from clickhouse_driver import errors
 
 from aioch import Client
@@ -30,6 +32,16 @@ class SelectTestCase(BaseTestCase):
             self.assertEqual(rv, [(2,)])
 
         self.loop.run_until_complete(run())
+
+    def test_from_url(self):
+        client = Client.from_url(f'clickhouse://{self.host}', loop=self.loop)
+
+        async def run():
+            rv = await client.execute('SELECT 2')
+            self.assertEqual(rv, [(2,)])
+
+        self.loop.run_until_complete(run())
+        self.loop.run_until_complete(client.disconnect())
 
 
 class ProgressTestCase(BaseTestCase):
@@ -69,5 +81,37 @@ class ProgressTestCase(BaseTestCase):
             await self.client.execute_with_progress('SELECT 2')
             rv = await self.client.cancel()
             self.assertEqual(rv, [(2,)])
+
+        self.loop.run_until_complete(run())
+
+
+class IterTestCase(BaseTestCase):
+    def test_simple(self):
+        async def run():
+            result = await self.client.execute_iter(
+                'SELECT number FROM system.numbers LIMIT 10'
+            )
+
+            self.assertIsInstance(result, types.AsyncGeneratorType)
+
+            self.assertEqual([i async for i in result], list(zip(range(10))))
+            self.assertEqual([i async for i in result], [])
+
+        self.loop.run_until_complete(run())
+
+    def test_next(self):
+        async def run():
+            result = await self.client.execute_iter(
+                'SELECT number FROM system.numbers LIMIT 3'
+            )
+
+            self.assertIsInstance(result, types.AsyncGeneratorType)
+
+            self.assertEqual(await result.__anext__(), (0, ))
+            self.assertEqual(await result.__anext__(), (1, ))
+            self.assertEqual(await result.__anext__(), (2, ))
+
+            with self.assertRaises(StopAsyncIteration):
+                await result.__anext__()
 
         self.loop.run_until_complete(run())

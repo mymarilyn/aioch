@@ -8,8 +8,8 @@ from setuptools import setup
 PY_VER = sys.version_info
 
 
-if PY_VER < (3, 5):
-    raise RuntimeError("aioch doesn't suppport Python earlier than 3.5")
+if PY_VER < (3, 6):
+    raise RuntimeError("aioch doesn't suppport Python earlier than 3.6")
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -66,7 +66,6 @@ setup(
 
         'Programming Language :: SQL',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
@@ -83,7 +82,7 @@ setup(
 
     packages=['aioch'],
     install_requires=[
-        'clickhouse-driver>=0.0.6'
+        'clickhouse-driver>=0.1.2'
     ],
     test_suite='nose.collector',
     tests_require=[
