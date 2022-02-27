@@ -83,7 +83,7 @@ setup(
 
     packages=['aioch'],
     install_requires=[
-        'clickhouse-driver>=0.1.2'
+        'clickhouse-driver>=0.1.3'
     ],
     test_suite='nose.collector',
     tests_require=[
