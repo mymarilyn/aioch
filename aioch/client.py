@@ -37,6 +37,10 @@ class Client(object):
         return await self.run_in_executor(self._client.execute, *args,
                                           **kwargs)
 
+    async def query_dataframe(self, *args, **kwargs):
+        return await self.run_in_executor(self._client.query_dataframe,
+                                          *args, **kwargs)
+
     async def execute_with_progress(
             self, query, params=None, with_column_types=False,
             external_tables=None, query_id=None, settings=None,

@@ -44,6 +44,15 @@ class SelectTestCase(BaseTestCase):
         self.loop.run_until_complete(client.disconnect())
 
 
+class PandasTestCase(BaseTestCase):
+    def test_query_dataframe(self):
+        async def run():
+            rv = await self.client.query_dataframe('SELECT 2')
+            self.assertEqual(rv, [(2,)])
+
+        self.loop.run_until_complete(run())
+
+
 class ProgressTestCase(BaseTestCase):
     def test_select_with_progress(self):
         async def run():
